@@ -2,8 +2,8 @@ use std::fmt;
 
 use derive_more::{Deref, DerefMut};
 
-mod ellipse;
-pub use ellipse::*;
+mod orbit;
+pub use orbit::*;
 
 pub type Vector = nalgebra::Vector2<f64>;
 
