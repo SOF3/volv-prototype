@@ -141,6 +141,7 @@ pub struct LargeBodySchema {
     grav_radius: Length,
     #[get_copy = "pub"]
     mass: Mass,
+    #[serde(default)]
     #[get = "pub"]
     children: Vec<LargeBodySchema>,
 }
