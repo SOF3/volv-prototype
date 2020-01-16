@@ -10,6 +10,7 @@ use wee_alloc::WeeAlloc;
 static ALLOC: WeeAlloc = WeeAlloc::INIT;
 
 mod handler;
+mod render;
 
 #[wasm_bindgen]
 extern "C" {

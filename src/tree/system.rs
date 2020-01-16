@@ -1,14 +1,17 @@
 use std::collections::{BTreeSet, HashMap};
-use std::f64;
+use std::f32;
+
+use getset::*;
 
 use super::*;
 use crate::math::{Length, Mass, Orbit, Time};
 
-#[derive(Debug)]
+#[derive(Debug, Getters)]
 pub struct System<H: Handler> {
     next_event_id: u32,
     next_body_id: u32,
 
+    #[get = "pub"]
     tree: Tree,
     event_queue: BTreeSet<Event<H>>,
 
@@ -68,7 +71,7 @@ impl<H: Handler> System<H> {
         let mut parent_index = HashMap::new();
         let mut root = to_body(&mut body_count, &mut parent_index, &schema, None);
 
-        root.grav_radius = Length(f64::INFINITY);
+        root.grav_radius = Length(f32::INFINITY);
 
         let tree = Tree::new(root, parent_index);
 
@@ -216,7 +219,7 @@ impl<H: Handler> System<H> {
 }
 
 #[derive(Debug, derive_new::new)]
-struct Tree {
+pub struct Tree {
     root: LargeBody,
     parent_index: HashMap<BodyId, LargeBodyId>,
 }

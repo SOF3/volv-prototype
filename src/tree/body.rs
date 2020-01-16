@@ -17,6 +17,12 @@ macro_rules! sl_body {
                 &self.0
             }
         }
+
+        impl From<$name> for BodyId {
+            fn from(id: $name) -> BodyId {
+                id.0
+            }
+        }
     };
 }
 sl_body!(LargeBodyId);
