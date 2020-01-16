@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use getset::*;
 
-use crate::math::{Eci, Length, Mass, Orbit};
+use crate::math::{Eci, Length, Mass, Orbit, Time};
 
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 pub struct BodyId(pub u32);
@@ -88,7 +88,7 @@ impl<'t> BodyMut<'t> {
     }
 }
 
-#[derive(Debug, Getters, CopyGetters)]
+#[derive(Debug, Getters, CopyGetters, Setters)]
 pub struct LargeBody {
     #[get_copy = "pub"]
     pub(super) id: LargeBodyId,
@@ -103,6 +103,7 @@ pub struct LargeBody {
     #[get_copy = "pub"]
     pub(super) mass: Mass,
     #[get = "pub"]
+    #[set = "pub(super)"]
     pub(super) orbit: Option<Orbit>,
 }
 
@@ -126,9 +127,35 @@ impl LargeBody {
             None
         }
     }
+
+    pub fn from_eci_in_parent(&self, t: Time, eci_in_parent: &Eci) -> Eci {
+        let my_orbit = self
+            .orbit
+            .as_ref()
+            .expect("from_eci_in_parent must be called on child bodies");
+        let my_eci = my_orbit.eci(t); // Eci of self in parent
+
+        Eci::new(
+            eci_in_parent.position() - my_eci.position(),
+            eci_in_parent.velocity() - my_eci.velocity(),
+        )
+    }
+
+    pub fn to_eci_in_parent(&self, t: Time, eci_in_self: &Eci) -> Eci {
+        let my_orbit = self
+            .orbit
+            .as_ref()
+            .expect("to_eci_in_parent must be called on child bodies");
+        let my_eci = my_orbit.eci(t);
+
+        Eci::new(
+            my_eci.position() + eci_in_self.position(),
+            my_eci.velocity() + eci_in_self.velocity(),
+        )
+    }
 }
 
-#[derive(Debug, CopyGetters)]
+#[derive(Debug, CopyGetters, Getters, Setters)]
 pub struct SmallBody {
     #[get_copy = "pub"]
     id: SmallBodyId,
@@ -136,6 +163,8 @@ pub struct SmallBody {
     mass: Mass,
     #[get_copy = "pub"]
     radius: Length,
+    #[get = "pub"]
+    #[set = "pub(super)"]
     orbit: Orbit,
 }
 

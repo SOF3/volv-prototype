@@ -10,7 +10,7 @@ pub struct System<H: Handler> {
     next_body_id: u32,
 
     tree: Tree,
-    event_queue: BTreeSet<Event>,
+    event_queue: BTreeSet<Event<H>>,
 
     handler: H,
 }
@@ -109,18 +109,19 @@ impl<H: Handler> System<H> {
                 .event_queue
                 .take(&key)
                 .expect("Event was obtained in quue");
-            self.exec_event(event);
+            self.exec_event(t, event);
         }
     }
 
-    fn exec_event(&mut self, event: Event) {
+    fn exec_event(&mut self, t: Time, event: Event<H>) {
         match event.into_type() {
-            EventType::Collision(event) => self.on_collision(event),
-            EventType::FieldChange(event) => self.on_field_change(event),
+            EventType::Collision(event) => self.on_collision(t, event),
+            EventType::FieldChange(event) => self.on_field_change(t, event),
+            EventType::Misc(f) => f(self),
         }
     }
 
-    fn on_collision(&mut self, collision: Collision) {
+    fn on_collision(&mut self, t: Time, collision: Collision) {
         let body1 = self.tree.get_body(collision.body1());
         let body2 = self.tree.get_body(collision.body2());
 
@@ -128,12 +129,89 @@ impl<H: Handler> System<H> {
         unimplemented!()
     }
 
-    fn on_field_change(&mut self, fc: FieldChange) {
+    fn on_field_change(&mut self, t: Time, fc: FieldChange) {
         let body = self.tree.get_body(fc.body());
         let from = self.tree.get_large_body(fc.from());
         let to = self.tree.get_large_body(fc.to());
+        let to_mass = to.mass();
+
+        #[derive(Debug, Clone, Copy)]
+        enum Direction {
+            ParentToChild,
+            ChildToParent,
+        }
+
+        let dir = if from.large.contains_key(&to.id()) {
+            Direction::ParentToChild
+        } else if to.large.contains_key(&from.id()) {
+            Direction::ChildToParent
+        } else {
+            panic!("Field of change must be between parent and child")
+        };
+
+        drop(from);
+        drop(to);
+
+        match body {
+            BodyRef::Large(body) => {
+                let id = body.id();
+                let from_eci = body
+                    .orbit()
+                    .as_ref()
+                    .expect("Body in FieldChange must be a child")
+                    .eci(t);
+                let mut body = self
+                    .tree
+                    .get_large_body_mut(fc.from())
+                    .large
+                    .remove(&id)
+                    .expect("Event data out of sync");
+
+                let to_eci = match dir {
+                    Direction::ParentToChild => self
+                        .tree
+                        .get_large_body(fc.to())
+                        .from_eci_in_parent(t, &from_eci),
+                    Direction::ChildToParent => self
+                        .tree
+                        .get_large_body(fc.from())
+                        .to_eci_in_parent(t, &from_eci),
+                };
+                body.set_orbit(Some(Orbit::from_mpv(to_mass, to_eci)));
+
+                self.tree.get_large_body_mut(fc.to()).large.insert(id, body);
+            }
+            BodyRef::Small(body) => {
+                let id = body.id();
+                let from_eci = body.orbit().eci(t);
+                let mut body = self
+                    .tree
+                    .get_large_body_mut(fc.from())
+                    .small
+                    .remove(&id)
+                    .expect("Event data out of sync");
+
+                let to_eci = match dir {
+                    Direction::ParentToChild => self
+                        .tree
+                        .get_large_body(fc.to())
+                        .from_eci_in_parent(t, &from_eci),
+                    Direction::ChildToParent => self
+                        .tree
+                        .get_large_body(fc.from())
+                        .to_eci_in_parent(t, &from_eci),
+                };
+                body.set_orbit(Orbit::from_mpv(to_mass, to_eci));
+
+                self.tree.get_large_body_mut(fc.to()).small.insert(id, body);
+            }
+        }
 
         unimplemented!()
+    }
+
+    pub fn schedule(&mut self, event: Event<H>) {
+        self.event_queue.insert(event);
     }
 }
 

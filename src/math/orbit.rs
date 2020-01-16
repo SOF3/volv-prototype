@@ -31,6 +31,9 @@ impl Orbit {
     pub fn velocity(&self, t: Time) -> Vector {
         unimplemented!()
     }
+    pub fn eci(&self, t: Time) -> Eci {
+        Eci::new(self.position(t), self.velocity(t))
+    }
 
     pub fn time_reaching(&self, height: Length) -> Option<Time> {
         unimplemented!()
@@ -46,7 +49,7 @@ pub struct Eci {
 }
 
 impl Eci {
-    pub fn from_pos_vel(position: Vector, velocity: Vector) -> Self {
+    pub fn new(position: Vector, velocity: Vector) -> Self {
         Self { position, velocity }
     }
 }
