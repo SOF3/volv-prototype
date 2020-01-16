@@ -1,6 +1,4 @@
 #![allow(dead_code, unused_variables)]
 
-mod math;
-mod tree;
-
-fn main() {}
+pub mod math;
+pub mod tree;

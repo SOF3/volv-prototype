@@ -1,5 +1,5 @@
 [package]
-name = "volv-prototype"
+name = "volv"
 version = "0.1.0"
 authors = ["SOFe <sofe2038@gmail.com>"]
 edition = "2018"

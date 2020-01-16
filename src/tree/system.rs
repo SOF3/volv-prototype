@@ -1,7 +1,8 @@
 use std::collections::{BTreeSet, HashMap};
+use std::f64;
 
 use super::*;
-use crate::math::Time;
+use crate::math::{Length, Time};
 
 #[derive(Debug)]
 pub struct System<H: Handler> {
@@ -21,7 +22,7 @@ fn next_id(id: &mut u64) -> u64 {
 }
 
 impl<H: Handler> System<H> {
-    pub(super) fn from_schema(schema: LargeBodySchema, handler: H) -> Self {
+    pub fn from_schema(schema: LargeBodySchema, handler: H) -> Self {
         fn to_body(
             body_count: &mut u64,
             parent_index: &mut HashMap<BodyId, LargeBodyId>,
@@ -51,7 +52,10 @@ impl<H: Handler> System<H> {
 
         let mut body_count = 0u64;
         let mut parent_index = HashMap::new();
-        let root = to_body(&mut body_count, &mut parent_index, &schema);
+        let mut root = to_body(&mut body_count, &mut parent_index, &schema);
+
+        root.grav_radius = Length(f64::INFINITY);
+
         let tree = Tree::new(root, parent_index);
 
         System {
@@ -71,11 +75,11 @@ impl<H: Handler> System<H> {
         BodyId(next_id(&mut self.next_body_id))
     }
 
-    pub(super) fn next_event(&self) -> Option<Time> {
+    pub fn next_event(&self) -> Option<Time> {
         self.event_queue.iter().next().map(|event| event.time())
     }
 
-    pub(super) fn advance_event(&mut self, t: Time) {
+    pub fn advance_event(&mut self, t: Time) {
         loop {
             let event = self.event_queue.iter().next();
             let event = match event {
