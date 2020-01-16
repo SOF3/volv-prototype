@@ -1,5 +1,7 @@
+dev := '--dev'
+
 wasm:
-	cd client && wasm-pack build
+	cd client && wasm-pack build {{dev}}
 dist: wasm
 	cd client/www && npm run build
 serve: dist

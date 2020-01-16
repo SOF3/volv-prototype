@@ -2,12 +2,20 @@ language: rust
 rust: [stable, beta, nightly]
 cache: cargo
 
+env:
+  matrix:
+    - DEV_FLAG="--dev"
+    - DEV_FLAG="--release"
+
 install:
   - "export RUSTFLAGS=$(cargo --version | grep nightly >/dev/null && echo \"-Z external-macro-backtrace\")"
   - "rustup component add rustfmt --toolchain $(rustup show active-toolchain | cut -d\" \" -f1)"
   - cargo install just wasm-pack
 
 script:
-  - just npm dist
+  - just dev="$DEV_FLAG" npm dist
   - cargo test --all
   - cargo fmt --all -- --check
+
+after_success:
+  - "stat target/wasm32-unknown-unknown/*/volv_client.wasm"
