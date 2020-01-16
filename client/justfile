@@ -1,6 +1,0 @@
-wasm:
-	wasm-pack build
-dist: wasm
-	cd www && npm run build
-serve: dist
-	sfz -r www/dist

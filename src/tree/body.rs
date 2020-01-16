@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use getset::*;
 
-use crate::math::{Length, Mass};
+use crate::math::{Orbit, Length, Mass,Eci};
 
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 pub struct BodyId(pub u64);
@@ -102,6 +102,8 @@ pub struct LargeBody {
     pub(super) grav_radius: Length,
     #[get_copy = "pub"]
     pub(super) mass: Mass,
+    #[get = "pub"]
+    pub(super) orbit: Option<Orbit>,
 }
 
 impl LargeBody {
@@ -126,11 +128,15 @@ impl LargeBody {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, CopyGetters)]
 pub struct SmallBody {
+    #[get_copy = "pub"]
     id: SmallBodyId,
+    #[get_copy = "pub"]
     mass: Mass,
+    #[get_copy = "pub"]
     radius: Length,
+    orbit: Orbit,
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Getters, CopyGetters)]
@@ -141,6 +147,8 @@ pub struct LargeBodySchema {
     grav_radius: Length,
     #[get_copy = "pub"]
     mass: Mass,
+    #[get = "pub"]
+    eci: Option<Eci>,
     #[serde(default)]
     #[get = "pub"]
     children: Vec<LargeBodySchema>,

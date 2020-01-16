@@ -16,5 +16,5 @@ description = "volv game prototype experiment"
 derive-new = "0.5.8"
 derive_more = "0.99.2"
 getset = "0.0.9"
-nalgebra = "0.19.0"
+nalgebra = {version = "0.19.0", features = ["serde-serialize"]}
 serde = {version = "1.0.104", features = ["derive"]}

@@ -2,7 +2,7 @@ use std::collections::{BTreeSet, HashMap};
 use std::f64;
 
 use super::*;
-use crate::math::{Length, Time};
+use crate::math::{Length, Time, Orbit,Mass};
 
 #[derive(Debug)]
 pub struct System<H: Handler> {
@@ -27,19 +27,29 @@ impl<H: Handler> System<H> {
             body_count: &mut u64,
             parent_index: &mut HashMap<BodyId, LargeBodyId>,
             schema: &LargeBodySchema,
+            parent_mass: Option<Mass>,
         ) -> LargeBody {
             let id = LargeBodyId(BodyId(next_id(body_count)));
             let children = schema
                 .children()
                 .iter()
                 .map(|schema| {
-                    let body = to_body(body_count, parent_index, schema);
+                    let body = to_body(body_count, parent_index, schema, Some(schema.mass()));
                     (body.id(), body)
                 })
                 .collect::<HashMap<_, _>>();
             for &child_id in children.keys() {
                 parent_index.insert(child_id.0, id);
             }
+
+            let orbit = match parent_mass {
+                Some(pm) => {
+                    let eci = schema.eci().as_ref().expect("All child bodies must have an ECI");
+                    Some(Orbit::from_mpv(pm, eci.clone()))
+                },
+                None => None,
+            };
+
             LargeBody {
                 id,
                 large: children,
@@ -47,12 +57,13 @@ impl<H: Handler> System<H> {
                 surface_radius: schema.surface_radius(),
                 grav_radius: schema.grav_radius(),
                 mass: schema.mass(),
+                orbit,
             }
         }
 
         let mut body_count = 0u64;
         let mut parent_index = HashMap::new();
-        let mut root = to_body(&mut body_count, &mut parent_index, &schema);
+        let mut root = to_body(&mut body_count, &mut parent_index, &schema, None);
 
         root.grav_radius = Length(f64::INFINITY);
 
