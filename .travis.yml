@@ -12,8 +12,8 @@ env:
 
 install:
   - "export RUSTFLAGS=$(cargo --version | grep nightly >/dev/null && echo \"-Z external-macro-backtrace\")"
-  - "rustup component add rustfmt --toolchain $(rustup show active-toolchain | cut -d\" \" -f1)"
   - "rustup default $RUST_DIST"
+  - "rustup component add rustfmt --toolchain $(rustup show active-toolchain | cut -d\" \" -f1)"
   - cargo install just wasm-pack
 
 script:
