@@ -6,8 +6,8 @@ use crate::math::{Length, Time, Orbit,Mass};
 
 #[derive(Debug)]
 pub struct System<H: Handler> {
-    next_event_id: u64,
-    next_body_id: u64,
+    next_event_id: u32,
+    next_body_id: u32,
 
     tree: Tree,
     event_queue: BTreeSet<Event>,
@@ -15,7 +15,7 @@ pub struct System<H: Handler> {
     handler: H,
 }
 
-fn next_id(id: &mut u64) -> u64 {
+fn next_id(id: &mut u32) -> u32 {
     let ret = *id;
     *id += 1;
     ret
@@ -24,7 +24,7 @@ fn next_id(id: &mut u64) -> u64 {
 impl<H: Handler> System<H> {
     pub fn from_schema(schema: LargeBodySchema, handler: H) -> Self {
         fn to_body(
-            body_count: &mut u64,
+            body_count: &mut u32,
             parent_index: &mut HashMap<BodyId, LargeBodyId>,
             schema: &LargeBodySchema,
             parent_mass: Option<Mass>,
@@ -61,7 +61,7 @@ impl<H: Handler> System<H> {
             }
         }
 
-        let mut body_count = 0u64;
+        let mut body_count = 0u32;
         let mut parent_index = HashMap::new();
         let mut root = to_body(&mut body_count, &mut parent_index, &schema, None);
 

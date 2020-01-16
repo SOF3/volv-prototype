@@ -5,7 +5,7 @@ use getset::*;
 use crate::math::{Orbit, Length, Mass,Eci};
 
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
-pub struct BodyId(pub u64);
+pub struct BodyId(pub u32);
 
 macro_rules! sl_body {
     ($name:ident) => {

@@ -54,4 +54,4 @@ unit!(Length, "m", 1.0);
 unit!(Mass, "g", 1000.0);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub struct Time(pub i64);
+pub struct Time(pub i32);

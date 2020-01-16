@@ -7,7 +7,7 @@ use super::body::*;
 use crate::math::Time;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub struct EventId(pub u64);
+pub struct EventId(pub u32);
 
 #[derive(Debug)]
 pub struct Event {
