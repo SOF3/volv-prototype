@@ -1,15 +1,19 @@
 language: rust
-rust: [stable, beta, nightly]
-cache: cargo
+rust: stable
 
 env:
   matrix:
-    - DEV_FLAG="--dev"
-    - DEV_FLAG="--release"
+    - DEV_FLAG="--dev" RUST_DIST="stable"
+    - DEV_FLAG="--release" RUST_DIST="stable"
+    - DEV_FLAG="--dev" RUST_DIST="beta"
+    - DEV_FLAG="--release" RUST_DIST="beta"
+    - DEV_FLAG="--dev" RUST_DIST="nightly"
+    - DEV_FLAG="--release" RUST_DIST="nightly"
 
 install:
   - "export RUSTFLAGS=$(cargo --version | grep nightly >/dev/null && echo \"-Z external-macro-backtrace\")"
   - "rustup component add rustfmt --toolchain $(rustup show active-toolchain | cut -d\" \" -f1)"
+  - "rustup default $RUST_DIST"
   - cargo install just wasm-pack
 
 script:
@@ -19,3 +23,13 @@ script:
 
 after_success:
   - "stat target/wasm32-unknown-unknown/*/volv_client.wasm"
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  keep_history: true
+  github_token: $GITHUB_TOKEN
+  local_dir: client/www/dist
+  on:
+    branch: master
+    condition: '"${RUST_DIST} ${DEV_FLAG}" == "stable --release"'
