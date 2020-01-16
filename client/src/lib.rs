@@ -12,16 +12,20 @@ static ALLOC: WeeAlloc = WeeAlloc::INIT;
 mod handler;
 
 #[wasm_bindgen]
-extern {
+extern "C" {
     fn alert(message: &str);
 }
 
 #[wasm_bindgen]
 pub fn main() {
-    let canvas = web_sys::window().unwrap()
-        .document().unwrap()
-        .get_element_by_id("main-canvas").unwrap()
-        .dyn_into::<web_sys::HtmlCanvasElement>().unwrap();
+    let canvas = web_sys::window()
+        .unwrap()
+        .document()
+        .unwrap()
+        .get_element_by_id("main-canvas")
+        .unwrap()
+        .dyn_into::<web_sys::HtmlCanvasElement>()
+        .unwrap();
 
     let (width, height) = (canvas.width(), canvas.height());
 
@@ -30,10 +34,12 @@ pub fn main() {
         None => {
             alert("2D canvas is not available");
             return;
-        },
+        }
     };
 
-    let canvas = canvas.dyn_into::<web_sys::CanvasRenderingContext2d>().unwrap();
+    let canvas = canvas
+        .dyn_into::<web_sys::CanvasRenderingContext2d>()
+        .unwrap();
     canvas.set_fill_style(&JsValue::from_str("black"));
     canvas.fill_rect(0.0, 0.0, width as f64, height as f64);
 

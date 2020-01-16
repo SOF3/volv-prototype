@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use getset::*;
 
-use crate::math::{Orbit, Length, Mass,Eci};
+use crate::math::{Eci, Length, Mass, Orbit};
 
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 pub struct BodyId(pub u32);

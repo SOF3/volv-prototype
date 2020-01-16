@@ -47,9 +47,6 @@ pub struct Eci {
 
 impl Eci {
     pub fn from_pos_vel(position: Vector, velocity: Vector) -> Self {
-        Self {
-            position,
-            velocity,
-        }
+        Self { position, velocity }
     }
 }

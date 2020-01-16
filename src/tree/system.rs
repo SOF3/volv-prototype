@@ -2,7 +2,7 @@ use std::collections::{BTreeSet, HashMap};
 use std::f64;
 
 use super::*;
-use crate::math::{Length, Time, Orbit,Mass};
+use crate::math::{Length, Mass, Orbit, Time};
 
 #[derive(Debug)]
 pub struct System<H: Handler> {
@@ -44,9 +44,12 @@ impl<H: Handler> System<H> {
 
             let orbit = match parent_mass {
                 Some(pm) => {
-                    let eci = schema.eci().as_ref().expect("All child bodies must have an ECI");
+                    let eci = schema
+                        .eci()
+                        .as_ref()
+                        .expect("All child bodies must have an ECI");
                     Some(Orbit::from_mpv(pm, eci.clone()))
-                },
+                }
                 None => None,
             };
 
