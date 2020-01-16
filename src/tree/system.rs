@@ -75,7 +75,6 @@ impl<H: Handler> System<H> {
         self.event_queue.iter().next().map(|event| event.time())
     }
 
-
     pub(super) fn advance_event(&mut self, t: Time) {
         loop {
             let event = self.event_queue.iter().next();
@@ -88,7 +87,10 @@ impl<H: Handler> System<H> {
             }
 
             let key = (event.id(), event.time());
-            let event = self.event_queue.take(&key).expect("Event was obtained in quue");
+            let event = self
+                .event_queue
+                .take(&key)
+                .expect("Event was obtained in quue");
             self.exec_event(event);
         }
     }
@@ -155,15 +157,17 @@ impl Tree {
         }
 
         self.get_large_body(self.parent_index[&id])
-            .get_child(id).unwrap()
+            .get_child(id)
+            .unwrap()
     }
 
     pub fn get_body_mut<'t>(&'t mut self, id: BodyId) -> BodyMut<'t> {
         if id == self.root.id().0 {
-            return BodyMut::Large(& mut self.root);
+            return BodyMut::Large(&mut self.root);
         }
 
         self.get_large_body_mut(self.parent_index[&id])
-            .get_child_mut(id).unwrap()
+            .get_child_mut(id)
+            .unwrap()
     }
 }

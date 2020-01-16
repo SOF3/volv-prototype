@@ -32,14 +32,14 @@ impl Body {
     pub fn unwrap_large(self) -> LargeBody {
         match self {
             Body::Large(body) => body,
-            Body::Small(_) => panic!("Expected large body, got small body")
+            Body::Small(_) => panic!("Expected large body, got small body"),
         }
     }
 
     pub fn unwrap_small(self) -> SmallBody {
         match self {
             Body::Large(_) => panic!("Expected small body, got large body"),
-            Body::Small(body) => body
+            Body::Small(body) => body,
         }
     }
 }
@@ -54,14 +54,14 @@ impl<'t> BodyRef<'t> {
     pub fn borrow_large(self) -> &'t LargeBody {
         match self {
             Self::Large(body) => body,
-            Self::Small(_) => panic!("Expected large body, got small body")
+            Self::Small(_) => panic!("Expected large body, got small body"),
         }
     }
 
     pub fn borrow_small(self) -> &'t SmallBody {
         match self {
             Self::Large(_) => panic!("Expected small body, got large body"),
-            Self::Small(body) => body
+            Self::Small(body) => body,
         }
     }
 }
@@ -76,14 +76,14 @@ impl<'t> BodyMut<'t> {
     pub fn borrow_large(self) -> &'t mut LargeBody {
         match self {
             Self::Large(body) => body,
-            Self::Small(_) => panic!("Expected large body, got small body")
+            Self::Small(_) => panic!("Expected large body, got small body"),
         }
     }
 
     pub fn borrow_small(self) -> &'t mut SmallBody {
         match self {
             Self::Large(_) => panic!("Expected small body, got large body"),
-            Self::Small(body) => body
+            Self::Small(body) => body,
         }
     }
 }

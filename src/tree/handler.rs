@@ -1,8 +1,12 @@
-use crate::math::{Vector,Length,Mass};
 use super::*;
+use crate::math::{Length, Mass, Vector};
 
-pub trait Handler : Sized {
-    fn on_collision(&mut self, body1: BodyRef<'_>, body2: BodyRef<'_>) -> (CollisionResolution, CollisionResolution);
+pub trait Handler: Sized {
+    fn on_collision(
+        &mut self,
+        body1: BodyRef<'_>,
+        body2: BodyRef<'_>,
+    ) -> (CollisionResolution, CollisionResolution);
 
     fn on_enter_subfield(&mut self, body: BodyRef<'_>, from: &LargeBody, to: &LargeBody);
     fn on_exit_subfield(&mut self, body: BodyRef<'_>, from: &LargeBody, to: &LargeBody);
