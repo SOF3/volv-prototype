@@ -18,3 +18,8 @@ derive_more = "0.99.2"
 getset = "0.0.9"
 nalgebra = {version = "0.19.0", features = ["serde-serialize"]}
 serde = {version = "1.0.104", features = ["derive"]}
+
+[profile.release]
+opt-level = 3 # change to "s" or "z" when we need to
+panic = "abort"
+lto = true
